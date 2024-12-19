@@ -23,6 +23,8 @@ resource "aws_instance" "web" {
 }
 
 
+
+
 # Outputs
 output "instance_ip" {
   value = aws_instance.web.public_ip

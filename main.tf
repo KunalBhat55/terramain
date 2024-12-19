@@ -16,6 +16,9 @@ module "iam-module" {
   source = "./modules/iam"
 }
 
+module "rds-module" {
+  source = "./modules/rds"
+}
 
 
 
