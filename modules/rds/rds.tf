@@ -5,4 +5,5 @@ resource "aws_db_instance" "main-db" {
   engine              = "postgres"
   publicly_accessible = true
   skip_final_snapshot = true
+
 }
