@@ -4,9 +4,9 @@ module "ec2-module" {
   ec2_profile = module.iam-module.ec2-profile
 }
 
-module "s3-module" {
-  source = "./modules/s3"
-}
+# module "s3-module" {
+#   source = "./modules/s3"
+# }
 
 module "vpc-module" {
   source = "./modules/vpc"
@@ -16,6 +16,9 @@ module "iam-module" {
   source = "./modules/iam"
 }
 
+# module "rds-module" {
+#   source = "./modules/rds"
+# }
 
 
 
