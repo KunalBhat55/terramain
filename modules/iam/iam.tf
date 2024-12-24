@@ -25,7 +25,7 @@ data "aws_iam_policy_document" "codebuild_assume_role" {
 
 
 # Permissions policy
-data "aws_iam_policy_document" "ec2_policy" {
+data "aws_iam_policy_document" "ec2_policy_document" {
   statement {
     actions   = ["s3:*"]
     resources = ["*"]
@@ -33,7 +33,7 @@ data "aws_iam_policy_document" "ec2_policy" {
   }
 }
 
-data "aws_iam_policy_document" "codebuild_policy" {
+data "aws_iam_policy_document" "codebuild_policy_document" {
   statement {
     effect = "Allow"
 
@@ -77,23 +77,37 @@ resource "aws_iam_role" "codebuild_role" {
 
 
 
-
-
-
 # Policy Resource (optional, creates a reusable policy)
 resource "aws_iam_policy" "ec2_policy" {
   name        = "ec2-policy"
   description = "Policy to allow EC2 access to S3"
-  policy      = data.aws_iam_policy_document.ec2_policy.json
+  policy      = data.aws_iam_policy_document.ec2_policy_document.json
 }
+
+resource "aws_iam_policy" "codebuild_policy" {
+  name        = "codebuild-policy"
+  description = "Policy to allow CodeBuild"
+  policy      = data.aws_iam_policy_document.codebuild_policy_document.json
+  
+}
+
 
 
 
 # Attach the Policy to the Role
 resource "aws_iam_role_policy_attachment" "ec2_policy_attachment" {
+
   role       = aws_iam_role.ec2_role.name
   policy_arn = aws_iam_policy.ec2_policy.arn
 }
+
+resource "aws_iam_role_policy_attachment" "codebuild_policy_attachment" {
+
+  role       = aws_iam_role.codebuild_role.name
+  policy_arn = aws_iam_policy.codebuild_policy.arn
+  
+}
+
 
 # Instance Profile
 resource "aws_iam_instance_profile" "ec2_profile" {
@@ -106,6 +120,16 @@ resource "aws_iam_instance_profile" "ec2_profile" {
 
 
 
+
+
+
+# Output
 output "ec2-profile" {
   value = aws_iam_instance_profile.ec2_profile.name
 }
+
+output "codebuild-role" {
+  value = aws_iam_role.codebuild_role.arn
+}
+
+

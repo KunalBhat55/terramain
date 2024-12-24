@@ -1,10 +1,6 @@
 # iam resources
 
 
-
-
-
-
 # fetching the security group
 data "aws_security_group" "work-sg" {
   name = var.sg_name
@@ -13,21 +9,7 @@ data "aws_security_group" "work-sg" {
 data "aws_ami" "amazon-linux" {
   most_recent = true
   owners      = ["amazon"]
-  filter {
-    name   = "name"
-    values = ["myami-*"]
-  }
-
-  filter {
-    name   = "root-device-type"
-    values = ["ebs"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-
+  
 }
 
 resource "aws_instance" "web" {
@@ -46,19 +28,6 @@ resource "aws_instance" "web" {
   key_name                    = "kunal-work"
   subnet_id                   = var.subnet_id
   iam_instance_profile        = var.ec2_profile
-
-  connection {
-    type        = "ssh"
-    user        = "ec2-user"
-    private_key = file("./kunal-work.pem")
-    host        = self.public_ip
-
-  }
-
-  provisioner "remote-exec" {
-    script = "scripts/install.sh"
-
-  }
 
 }
 
