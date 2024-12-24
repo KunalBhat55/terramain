@@ -23,6 +23,21 @@ data "aws_iam_policy_document" "codebuild_assume_role" {
   }
 }
 
+# codedeploy Trust relationship
+data "aws_iam_policy_document" "codedeploy_assume_role" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["codedeploy.amazonaws.com"]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
+  
+}
+
 
 # Permissions policy
 data "aws_iam_policy_document" "ec2_policy_document" {
@@ -64,6 +79,31 @@ data "aws_iam_policy_document" "codebuild_policy_document" {
 
 }
 
+data "aws_iam_policy_document" "codedeploy_policy_document" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "s3:Get*",
+      "s3:List*",
+      "s3:Put*",
+    ]
+
+    resources = ["*"]
+  }
+
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "codedeploy:*",
+    ]
+
+    resources = ["*"]
+  }
+  
+}
+
 # IAM Role
 resource "aws_iam_role" "ec2_role" {
   name               = "ec2-role"
@@ -73,6 +113,11 @@ resource "aws_iam_role" "ec2_role" {
 resource "aws_iam_role" "codebuild_role" {
   name               = "codebuild-role"
   assume_role_policy = data.aws_iam_policy_document.codebuild_assume_role.json
+}
+
+resource "aws_iam_role" "codedeploy_role" {
+  name               = "codedeploy-role"
+  assume_role_policy = data.aws_iam_policy_document.codedeploy_assume_role.json
 }
 
 
@@ -91,6 +136,13 @@ resource "aws_iam_policy" "codebuild_policy" {
   
 }
 
+resource "aws_iam_policy" "codedeploy_policy" {
+  name        = "codedeploy-policy"
+  description = "Policy to allow CodeDeploy"
+  policy      = data.aws_iam_policy_document.codedeploy_policy_document.json  
+  
+}
+
 
 
 
@@ -106,6 +158,12 @@ resource "aws_iam_role_policy_attachment" "codebuild_policy_attachment" {
   role       = aws_iam_role.codebuild_role.name
   policy_arn = aws_iam_policy.codebuild_policy.arn
   
+}
+
+resource "aws_iam_role_policy_attachment" "codedeploy_policy_attachment" {
+
+  role       = aws_iam_role.codedeploy_role.name
+  policy_arn = aws_iam_policy.codedeploy_policy.arn
 }
 
 
@@ -132,4 +190,7 @@ output "codebuild-role" {
   value = aws_iam_role.codebuild_role.arn
 }
 
+output "codedeploy-role" {
+  value = aws_iam_role.codedeploy_role.arn
+}
 

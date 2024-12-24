@@ -1,3 +1,4 @@
+# codebuild
 resource "aws_codebuild_project" "work-codebuild-project" {
   name = "work-codebuild-project"
   source {
@@ -35,4 +36,29 @@ resource "aws_codebuild_project" "work-codebuild-project" {
     }
   }
 
+}
+
+
+
+# codedeploy
+resource "aws_codedeploy_app" "work-codedeploy-app" {
+  name     = "work-codedeploy-app"
+  compute_platform = "Server"
+
+}
+resource "aws_codedeploy_deployment_group" "work-codedeploy-deployment-group" {
+
+  app_name = aws_codedeploy_app.work-codedeploy-app.name
+  deployment_group_name = "work-codedeploy-deployment-group"
+  service_role_arn = var.codedeploy-role
+  
+  ec2_tag_set {
+    ec2_tag_filter {
+      key   = "Name"
+      type  = "KEY_AND_VALUE"
+      value = "work"
+    }
+    
+  }
+  outdated_instances_strategy = "UPDATE"
 }

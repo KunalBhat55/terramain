@@ -1,6 +1,3 @@
-# iam resources
-
-
 # fetching the security group
 data "aws_security_group" "work-sg" {
   name = var.sg_name
