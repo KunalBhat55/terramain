@@ -16,6 +16,12 @@ module "iam-module" {
   source = "./modules/iam"
 }
 
+module "codebuild-module" {
+  source = "./modules/developertools"
+  codebuild-role = module.iam-module.codebuild-role
+  codedeploy-role = module.iam-module.codedeploy-role
+}
+
 # module "rds-module" {
 #   source = "./modules/rds"
 # }
