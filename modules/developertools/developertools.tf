@@ -1,10 +1,10 @@
 # codebuild
 resource "aws_codebuild_project" "work-codebuild-project" {
   name = "work-codebuild-project"
+
   source {
-    type            = "GITHUB"
-    location        = "https://github.com/KunalBhat55/Blogify.git"
-    git_clone_depth = 1 # how many commits to clone
+    type     = "GITHUB"
+    location = "https://github.com/KunalBhat55/Blogify.git"
   }
   service_role = var.codebuild-role
 
@@ -15,18 +15,12 @@ resource "aws_codebuild_project" "work-codebuild-project" {
 
   }
 
-
-
   artifacts {
     type      = "S3"
     packaging = "ZIP"
     location  = "kunal-work-bucket"
   }
   build_timeout = "8" # in minutes
-
-
-
-
 
 
   logs_config {
@@ -59,7 +53,63 @@ resource "aws_codedeploy_deployment_group" "work-codedeploy-deployment-group" {
       type  = "KEY_AND_VALUE"
       value = "Application"
     }
+    ec2_tag_filter {
+      key   = "Name"
+      type  = "KEY_AND_VALUE"
+      value = "manage-node"
+    }
 
   }
   outdated_instances_strategy = "UPDATE"
+}
+
+# codepipeline
+resource "aws_codepipeline" "work-codepipeline" {
+  name     = "work-codepipeline"
+  role_arn = var.codebuild-role #TODO
+
+  artifact_store {
+    location = "kunal-work-bucket"
+    type     = "S3"
+  }
+
+  stage {
+    name = "Source"
+    action {
+      name             = "Source"
+      category         = "Source"
+      owner            = "AWS"
+      provider         = "GitHub"
+      version          = "2"
+      output_artifacts = ["source_output"]
+    }
+
+  }
+  stage {
+    name = "Build"
+    action {
+      name             = "Build"
+      category         = "Build"
+      owner            = "AWS"
+      provider         = "CodeBuild"
+      version          = "1"
+      input_artifacts  = ["source_output"]
+      output_artifacts = ["build_output"]
+    }
+  }
+  stage {
+    name = "Deploy"
+    action {
+      name            = "Deploy"
+      category        = "Deploy"
+      owner           = "AWS"
+      provider        = "CodeDeploy"
+      version         = "1"
+      input_artifacts = ["build_output"]
+      
+    }
+    
+  }
+
+
 }
