@@ -35,8 +35,23 @@ data "aws_iam_policy_document" "codedeploy_assume_role" {
 
     actions = ["sts:AssumeRole"]
   }
-  
+
 }
+
+data "aws_iam_policy_document" "codepipeline_assume_role" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["codepipeline.amazonaws.com"]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
+}
+
+
 
 
 # Permissions policy
@@ -101,8 +116,15 @@ data "aws_iam_policy_document" "codedeploy_policy_document" {
 
     resources = ["*"]
   }
+
+}
+
+data "aws_iam_policy_document" "codepipeline_policy_document" {
   
 }
+
+
+
 
 # IAM Role
 resource "aws_iam_role" "ec2_role" {
@@ -120,6 +142,11 @@ resource "aws_iam_role" "codedeploy_role" {
   assume_role_policy = data.aws_iam_policy_document.codedeploy_assume_role.json
 }
 
+resource "aws_iam_role" "codepipeline_role" {
+  name               = "codepipeline-role"
+  assume_role_policy = data.aws_iam_policy_document.codepipeline_assume_role.json  
+}
+
 
 
 # Policy Resource (optional, creates a reusable policy)
@@ -133,14 +160,14 @@ resource "aws_iam_policy" "codebuild_policy" {
   name        = "codebuild-policy"
   description = "Policy to allow CodeBuild"
   policy      = data.aws_iam_policy_document.codebuild_policy_document.json
-  
+
 }
 
 resource "aws_iam_policy" "codedeploy_policy" {
   name        = "codedeploy-policy"
   description = "Policy to allow CodeDeploy"
-  policy      = data.aws_iam_policy_document.codedeploy_policy_document.json  
-  
+  policy      = data.aws_iam_policy_document.codedeploy_policy_document.json
+
 }
 
 
@@ -157,7 +184,7 @@ resource "aws_iam_role_policy_attachment" "codebuild_policy_attachment" {
 
   role       = aws_iam_role.codebuild_role.name
   policy_arn = aws_iam_policy.codebuild_policy.arn
-  
+
 }
 
 resource "aws_iam_role_policy_attachment" "codedeploy_policy_attachment" {
@@ -165,6 +192,15 @@ resource "aws_iam_role_policy_attachment" "codedeploy_policy_attachment" {
   role       = aws_iam_role.codedeploy_role.name
   policy_arn = aws_iam_policy.codedeploy_policy.arn
 }
+
+resource "aws_iam_role_policy_attachment" "codepipeline_policy" {
+  role       = aws_iam_role.codepipeline_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSCodePipelineFullAccess"
+}
+
+
+
+
 
 
 # Instance Profile
