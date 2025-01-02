@@ -7,3 +7,7 @@ variable "codedeploy-role" {
   description = "The ARN of the IAM role that allows CodeDeploy to interact with dependent AWS services on behalf of the AWS account."
   type = string
 }
+variable "codepipeline-role" {
+  description = "The ARN of the IAM role that allows CodePipeline to interact with dependent AWS services on behalf of the AWS account."
+  type = string
+}
