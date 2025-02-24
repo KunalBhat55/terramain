@@ -66,7 +66,7 @@ resource "aws_codedeploy_deployment_group" "work-codedeploy-deployment-group" {
 # codepipeline
 resource "aws_codepipeline" "work-codepipeline" {
   name     = "work-codepipeline"
-  role_arn = var.codebuild-role #TODO
+  role_arn = var.codepipeline-role 
 
   artifact_store {
     location = "kunal-work-bucket"
@@ -78,13 +78,18 @@ resource "aws_codepipeline" "work-codepipeline" {
     action {
       name             = "Source"
       category         = "Source"
-      owner            = "AWS"
+      owner            = "ThirdParty"
       provider         = "GitHub"
-      version          = "2"
+      version          = "1"      
       output_artifacts = ["source_output"]
+      
+
     }
 
   }
+
+
+  
   stage {
     name = "Build"
     action {
@@ -110,6 +115,12 @@ resource "aws_codepipeline" "work-codepipeline" {
     }
     
   }
-
-
 }
+
+
+
+
+
+
+
+

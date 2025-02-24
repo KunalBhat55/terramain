@@ -20,6 +20,7 @@ module "developertools-module" {
   source = "./modules/developertools"
   codebuild-role = module.iam-module.codebuild-role
   codedeploy-role = module.iam-module.codedeploy-role
+  codepipeline-role = module.iam-module.codepipeline-role
 }
 
 # module "rds-module" {
